@@ -1324,7 +1324,7 @@ static int write_manifest(AVFormatContext *s, int final)
                 get_hls_playlist_name(playlist_file, sizeof(playlist_file), NULL, i);
                 ff_hls_write_stream_info(st, c->m3u8_out, stream_bitrate,
                                          playlist_file, agroup,
-                                         codec_str, NULL, NULL);
+                                         codec_str, NULL, NULL, 0);
             }
 
         } else {
@@ -1350,7 +1350,7 @@ static int write_manifest(AVFormatContext *s, int final)
                 get_hls_playlist_name(playlist_file, sizeof(playlist_file), NULL, i);
                 ff_hls_write_stream_info(st, c->m3u8_out, stream_bitrate,
                                          playlist_file, NULL,
-                                         codec_str, NULL, NULL);
+                                         codec_str, NULL, NULL, 0);
             }
         }
 

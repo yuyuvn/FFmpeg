@@ -69,7 +69,7 @@ void ff_hls_write_subtitle_rendition(AVIOContext *out, const char *sgroup,
 void ff_hls_write_stream_info(AVStream *st, AVIOContext *out, int bandwidth,
                               const char *filename, const char *agroup,
                               const char *codecs, const char *ccgroup,
-                              const char *sgroup)
+                              const char *sgroup, int no_cc)
 {
     if (!out || !filename)
         return;
@@ -90,6 +90,8 @@ void ff_hls_write_stream_info(AVStream *st, AVIOContext *out, int bandwidth,
         avio_printf(out, ",AUDIO=\"group_%s\"", agroup);
     if (ccgroup && ccgroup[0])
         avio_printf(out, ",CLOSED-CAPTIONS=\"%s\"", ccgroup);
+    else if (no_cc)
+        avio_printf(out, ",CLOSED-CAPTIONS=NONE");
     if (sgroup && sgroup[0])
         avio_printf(out, ",SUBTITLES=\"%s\"", sgroup);
     avio_printf(out, "\n%s\n\n", filename);

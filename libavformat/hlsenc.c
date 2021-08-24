@@ -109,6 +109,7 @@ typedef enum HLSFlags {
     HLS_PERIODIC_REKEY = (1 << 12),
     HLS_INDEPENDENT_SEGMENTS = (1 << 13),
     HLS_I_FRAMES_ONLY = (1 << 14),
+    HLS_NO_CC = (1 << 15),
 } HLSFlags;
 
 typedef enum {
@@ -246,6 +247,7 @@ typedef struct HLSContext {
     int version; /* HLS version */
     char *var_stream_map; /* user specified variant stream map string */
     char *cc_stream_map; /* user specified closed caption streams map string */
+    int no_cc;
     char *master_pl_name;
     unsigned int master_publish_rate;
     int http_persistent;
@@ -1510,11 +1512,11 @@ static int create_master_playlist(AVFormatContext *s,
 
         if (!hls->has_default_key || !hls->has_video_m3u8) {
             ff_hls_write_stream_info(vid_st, hls->m3u8_out, bandwidth, m3u8_rel_name,
-                    aud_st ? vs->agroup : NULL, vs->codec_attr, ccgroup, sgroup);
+                    aud_st ? vs->agroup : NULL, vs->codec_attr, ccgroup, sgroup, hls->no_cc);
         } else {
             if (vid_st) {
                 ff_hls_write_stream_info(vid_st, hls->m3u8_out, bandwidth, m3u8_rel_name,
-                                         aud_st ? vs->agroup : NULL, vs->codec_attr, ccgroup, sgroup);
+                                         aud_st ? vs->agroup : NULL, vs->codec_attr, ccgroup, sgroup, hls->no_cc);
             }
         }
     }
@@ -3129,6 +3131,7 @@ static const AVOption options[] = {
     {"periodic_rekey", "reload keyinfo file periodically for re-keying", 0, AV_OPT_TYPE_CONST, {.i64 = HLS_PERIODIC_REKEY }, 0, UINT_MAX,   E, "flags"},
     {"independent_segments", "add EXT-X-INDEPENDENT-SEGMENTS, whenever applicable", 0, AV_OPT_TYPE_CONST, { .i64 = HLS_INDEPENDENT_SEGMENTS }, 0, UINT_MAX, E, "flags"},
     {"iframes_only", "add EXT-X-I-FRAMES-ONLY, whenever applicable", 0, AV_OPT_TYPE_CONST, { .i64 = HLS_I_FRAMES_ONLY }, 0, UINT_MAX, E, "flags"},
+    {"no_cc", "add CLOSED-CAPTIONS=NONE if CC is not presented", OFFSET(no_cc), AV_OPT_TYPE_BOOL, { .i64 = HLS_NO_CC }, 0, 1, E, "flags"},
     {"strftime", "set filename expansion with strftime at segment creation", OFFSET(use_localtime), AV_OPT_TYPE_BOOL, {.i64 = 0 }, 0, 1, E },
     {"strftime_mkdir", "create last directory component in strftime-generated filename", OFFSET(use_localtime_mkdir), AV_OPT_TYPE_BOOL, {.i64 = 0 }, 0, 1, E },
     {"hls_playlist_type", "set the HLS playlist type", OFFSET(pl_type), AV_OPT_TYPE_INT, {.i64 = PLAYLIST_TYPE_NONE }, 0, PLAYLIST_TYPE_NB-1, E, "pl_type" },
